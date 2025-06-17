@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
             email: this.email,
           },
           process.env.JWT_SECRET_KEY,
-          { expiresIn: "30d" }
+          { expiresIn: "8h" }
         );
       } catch (err) {
         console.error(err);
@@ -45,7 +45,6 @@ module.exports = (sequelize, DataTypes) => {
       phoneNo: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
       },
       profile: {
         type: DataTypes.STRING,
