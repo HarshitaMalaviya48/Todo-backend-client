@@ -11,6 +11,8 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^16.5.0",
     "email-validator": "^2.0.4",
     "express": "^5.1.0",
