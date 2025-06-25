@@ -1,11 +1,14 @@
+const jwt = require("jsonwebtoken");
+
 const {
   userDetailsValidator,
   validtaPassword,
   bodyParsing,
 } = require("../utills/userValidator");
 const passwordHelper = require("../utills/passwordHelper");
-const db = require("../../models");
+const db = require("../db/models");
 const user = db.user;
+const blackListToken = db.blackListToken;
 
 exports.register_user = async (data) => {
   const bodyParsingError = bodyParsing(data);
@@ -16,7 +19,7 @@ exports.register_user = async (data) => {
   const error = userDetailsValidator(userName, email, phoneNo);
 
   if (error) {
-    console.log("in validator error block");
+    // console.log("in validator error block");
 
     return { status_code: 400, res: { message: error } };
   }
@@ -24,12 +27,12 @@ exports.register_user = async (data) => {
   const passwordError = validtaPassword(password);
 
   if (passwordError) {
-    console.log("in password  validator error block");
+    // console.log("in password  validator error block");
     return { status_code: 400, res: { message: passwordError } };
   }
 
   const hashedPassword = await passwordHelper.hashPassword(password);
-  console.log(hashedPassword);
+  // console.log(hashedPassword);
 
   const newUser = await user.create({
     userName,
@@ -52,7 +55,7 @@ exports.login_user = async (data) => {
   }
   const { email, password } = data;
 
-  console.log(email, password);
+  // console.log(email, password);
   if (!email || !password) {
     return {
       status_code: 400,
@@ -79,3 +82,26 @@ exports.login_user = async (data) => {
     res: { message: "User is logged in", token: await getUser.generateToken() },
   };
 };
+
+exports.logout_user = async (authHeader) => {
+  if(!authHeader || !authHeader.startsWith("Bearer ")){
+    return{
+      status_code: 401,
+      res: {message: "Token is missing"}
+    }
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  if(token){
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
+    await blackListToken.create({token,
+      expiresAt: new Date(decoded.exp *1000)
+    })
+  }
+
+  return {
+    status_code: 200,
+    res: {message: "user logout successfully"}
+  }
+}

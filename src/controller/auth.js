@@ -1,45 +1,52 @@
-const authModule = require("../modules/auth")
-
+const authModule = require("../modules/auth");
+const {
+  sequelizeUniqueConstraintError,
+  handleServerError,
+} = require("../utills/errorHandler");
 
 // POST method to register user
 const registration = async (req, res) => {
   try {
-
     const posted_data = req.body;
     const response = await authModule.register_user(posted_data);
-   
-    res.status(response.status_code).json({...response.res});
-  } catch (err) {
-    console.log(err);
-    if (err.name === "SequelizeUniqueConstraintError") {
-      console.log("in duplicate error", err.name);
-      const field = err.errors[0].path;
-      return res.status(409).json({ message: `${field} already exists` });
-    }
-    return res.status(500).json({ message: "Internal Server error" });
+
+    res.status(response.status_code).json({ ...response.res });
+  } catch (error) {
+    console.log(error);
+    return sequelizeUniqueConstraintError(error, res);
   }
 };
-
-
 
 // POST method to login user
 
 const login = async (req, res) => {
   try {
-
     const posted_data = req.body;
     const response = await authModule.login_user(posted_data);
-    
+
     return res.status(response.status_code).json({
-      ...response.res
+      ...response.res,
     });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Internal Server error" });
+  } catch (error) {
+    return handleServerError(error, res);
+  }
+};
+
+//method to logout user
+
+const logout = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const response = await authModule.logout_user(authHeader);
+
+    return res.status(response.status_code).json({ ...response.res });
+  } catch (error) {
+    return handleServerError(error, res);
   }
 };
 
 module.exports = {
-    registration,
-    login
-}
+  registration,
+  login,
+  logout,
+};

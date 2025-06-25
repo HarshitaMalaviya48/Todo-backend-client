@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
-const { create, read, update, deleteTodo } = require("../controller/todo.js");
-const { jwtAuthMiddleware } = require("../jwt.js");
-router.use(jwtAuthMiddleware)
+const { create, readTodo, readTodos, update, deleteTodo } = require("../controller/todo.js");
+const { jwtAuthMiddleware } = require("../middleware/jwt.js");
+router.use(jwtAuthMiddleware);
 router.post("/create", create);
-router.get("/read", read);
+router.get("/readTodo/:id", readTodo);
+router.get("/readTodos", readTodos);
 router.put("/update/:id", update);
 router.delete("/delete/:id", deleteTodo);
 

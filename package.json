@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,8 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "@types/sequelize": "^4.28.20"
+    "@types/sequelize": "^4.28.20",
+    "chai": "^5.2.0",
+    "mocha": "^11.7.1"
   }
 }

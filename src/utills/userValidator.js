@@ -16,9 +16,9 @@ const userDetailsValidator = (userName, email, phoneNo) => {
     return "Invalid PhoneNo";
   }
   if (!constants.USERNAME_REGEX.test(userName)) {
-    return "Username length must be more than or equal to 3";
+    return "Username length must be more than or equal to 3 and should be all charcter";
   }
-  console.log("email", email);
+  // console.log("email", email);
 
   if (!emailValidator.validate(email)) {
     return "Email format is not proper";
@@ -30,7 +30,7 @@ const userDetailsValidator = (userName, email, phoneNo) => {
 //Validate Password
 const validtaPassword = (password) => {
   if (!password) {
-    return "Every field is mandatory";
+    return "Password is mandatory";
   }
   if (!constants.PASSWORD_REGEX.test(password)) {
     return "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.";

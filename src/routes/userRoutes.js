@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 //local module
-const { jwtAuthMiddleware } = require("../jwt.js");
+const { jwtAuthMiddleware } = require("../middleware/jwt.js");
 const { userUpdate, userDelete, userGet } = require("../controller/user.js");
 const {upload} = require("../utills/uploadPhoto.js");
 

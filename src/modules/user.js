@@ -1,5 +1,8 @@
-const db = require("../../models");
+const jwt = require("jsonwebtoken")
+
+const db = require("../db/models");
 const user = db.user;
+const blackListToken = db.blackListToken;
 const {
   userDetailsValidator,
   validtaPassword,
@@ -25,7 +28,7 @@ exports.user_get = async (userId) => {
     }
 } 
 
-exports.user_update = async (userId, data) => {
+exports.user_update = async (userId, data, authHeader) => {
     const bodyParsingError = bodyParsing(data);
   if (bodyParsingError)  return bodyParsingError;
 
@@ -66,6 +69,17 @@ exports.user_update = async (userId, data) => {
     }
 
     const isSensitiveChange = email != existingUser.email || passwordchanged;
+
+    if(isSensitiveChange){
+      const token = authHeader.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
+      console.log("in update block",decoded);
+      
+      await blackListToken.create({
+        token,
+        expiresAt: new Date(decoded.exp * 1000)
+      })
+    }
 
     await user.update(
       {
