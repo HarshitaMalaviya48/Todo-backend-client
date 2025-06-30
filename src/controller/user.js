@@ -2,8 +2,7 @@
 
 const userModule = require("../modules/user");
 const {sequelizeUniqueConstraintError, sequelizeForeignKeyConstraintError, handleServerError} = require("../utills/errorHandler")
-const db = require("../db/models");
-const user = db.user;
+
 
 //GET method to get user details
 
@@ -25,9 +24,9 @@ const userUpdate = async (req, res) => {
     const posted_data = req.body;
     const userId = req.user.userId;
     const authHeader = req.headers.authorization
-    const response = await userModule.user_update(userId, posted_data, authHeader);
+    const response = await userModule.user_update(userId, posted_data, req.file, authHeader);
 
-    return res.status((await response).status_code).json({
+    return res.status(response.status_code).json({
       ...response.res,
     });
   } catch (error) {

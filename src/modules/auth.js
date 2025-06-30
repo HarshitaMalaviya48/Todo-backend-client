@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+const {generateToken} = require("../middleware/jwt")
 const {
   userDetailsValidator,
   validtaPassword,
@@ -12,7 +13,7 @@ const blackListToken = db.blackListToken;
 
 exports.register_user = async (data) => {
   const bodyParsingError = bodyParsing(data);
-  if (bodyParsingError)  return bodyParsingError;
+  if (bodyParsingError) return bodyParsingError;
 
   const { userName, email, phoneNo, password } = data;
   const profilePath = data.file ? data.file.path : null;
@@ -21,14 +22,14 @@ exports.register_user = async (data) => {
   if (error) {
     // console.log("in validator error block");
 
-    return { status_code: 400, res: { message: error } };
+    return { status_code: 400, message: error };
   }
 
   const passwordError = validtaPassword(password);
 
   if (passwordError) {
     // console.log("in password  validator error block");
-    return { status_code: 400, res: { message: passwordError } };
+    return { status_code: 400, message: passwordError };
   }
 
   const hashedPassword = await passwordHelper.hashPassword(password);
@@ -44,8 +45,11 @@ exports.register_user = async (data) => {
 
   return {
     status_code: 200,
-    res: { message: "User registered Successfully", data: newUser },
+    message: "User registered Successfully",
+    data: newUser,
   };
+
+  // throw new Error("database connection failed")
 };
 
 exports.login_user = async (data) => {
@@ -79,29 +83,23 @@ exports.login_user = async (data) => {
 
   return {
     status_code: 200,
-    res: { message: "User is logged in", token: await getUser.generateToken() },
+    res: { message: "User is logged in", token: await generateToken(getUser) },
   };
 };
 
 exports.logout_user = async (authHeader) => {
-  if(!authHeader || !authHeader.startsWith("Bearer ")){
-    return{
-      status_code: 401,
-      res: {message: "Token is missing"}
-    }
-  }
-
   const token = authHeader.split(" ")[1];
 
-  if(token){
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
-    await blackListToken.create({token,
-      expiresAt: new Date(decoded.exp *1000)
-    })
+  if (token) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    await blackListToken.create({
+      token,
+      expiresAt: new Date(decoded.exp * 1000),
+    });
   }
 
   return {
     status_code: 200,
-    res: {message: "user logout successfully"}
-  }
-}
+    res: { message: "user logout successfully" },
+  };
+};

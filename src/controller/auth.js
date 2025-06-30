@@ -9,8 +9,9 @@ const registration = async (req, res) => {
   try {
     const posted_data = req.body;
     const response = await authModule.register_user(posted_data);
+    const {status_code, ...rest} = response;
 
-    res.status(response.status_code).json({ ...response.res });
+    res.status(status_code).json(rest);
   } catch (error) {
     console.log(error);
     return sequelizeUniqueConstraintError(error, res);

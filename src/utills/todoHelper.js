@@ -33,7 +33,27 @@ const validateDate = (date) => {
   };
 };
 
+const todoFoundOrNot = (todo) => {
+  if(!todo){
+    return {
+      status_code: 404,
+      message: "Todo not found"}
+  }
+  return null;
+}
+
+const userIsAuthorizedOrNot = (todoUserId, userId) => {
+  if(todoUserId != userId){
+    return {
+      status_code: 401,
+      message: "Unauthorized: not your todo"};
+  }
+  return null;
+}
+
 module.exports = {
   validateTodo,
   validateDate,
+  todoFoundOrNot,
+  userIsAuthorizedOrNot
 };

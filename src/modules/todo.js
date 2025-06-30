@@ -1,6 +1,12 @@
+const { format, parse } = require("date-fns");
 
 //local module
-const { validateTodo, validateDate } = require("../utills/todoHelper");
+const {
+  validateTodo,
+  validateDate,
+  todoFoundOrNot,
+  userIsAuthorizedOrNot,
+} = require("../utills/todoHelper");
 const db = require("../db/models");
 const todo = db.todo;
 
@@ -11,22 +17,20 @@ exports.todo_create = async (data, userId) => {
   if (validateTodoRes) {
     return {
       status_code: 400,
-      res: { message: validateTodoRes },
+      message: validateTodoRes,
     };
   }
 
   const validateDateRes = validateDate(date);
 
-  if(validateDateRes.error){
+  if (validateDateRes.error) {
     return {
       status_code: 400,
-      res: {message: validateDateRes.message}
-    }
+      message: validateDateRes.message,
+    };
   }
 
-  const formattedDate = validateDateRes.date
- 
-  
+  const formattedDate = validateDateRes.date;
 
   const createTodo = await todo.create({
     title,
@@ -37,7 +41,8 @@ exports.todo_create = async (data, userId) => {
 
   return {
     status_code: 200,
-    res: {message: "Todo is created", data: createTodo },
+    message: "Todo is created",
+    data: createTodo,
   };
 };
 
@@ -49,7 +54,7 @@ exports.todo_reads = async (userId) => {
   if (!userTodo || userTodo.length === 0) {
     return {
       status_code: 404,
-      res: { message: "No todo founds for user" },
+      message: "No todo founds for user",
     };
   }
 
@@ -59,13 +64,13 @@ exports.todo_reads = async (userId) => {
       id: item.id,
       title: item.title,
       description: item.description,
-      date: format(dateObj, "dd-MM-yyyy"),
+      date: format(dateObj, "yyyy-MM-dd"),
       userId: item.userId,
     };
   });
   return {
     status_code: 200,
-    res: { data: formattedTodo },
+    data: formattedTodo,
   };
 };
 
@@ -74,17 +79,21 @@ exports.tood_update = async (data, id, userId) => {
     where: { id },
   });
 
-  if(!userTodo){
+  const todoFoundOrNotRes = todoFoundOrNot(userTodo);
+  if (todoFoundOrNotRes) {
     return {
-      status_code: 400,
-      res: {message: "Todo not found"}
-    }
+      ...todoFoundOrNotRes,
+    };
   }
 
-  if (userTodo.userId != userId) {
+  const userIsAuthorizedOrNotRes = userIsAuthorizedOrNot(
+    userTodo.userId,
+    userId
+  );
+
+  if (userIsAuthorizedOrNotRes) {
     return {
-      status_code: 400,
-      res: { message: "Unauthorized: not your todo" },
+      ...userIsAuthorizedOrNotRes,
     };
   }
 
@@ -92,14 +101,14 @@ exports.tood_update = async (data, id, userId) => {
   const description = data.description || userTodo.description;
   let date = userTodo.date;
   if (data.date) {
-   const validateDateRes = validateDate(data.date);
-   if(validateDateRes.error){
-    return {
-      status_code: 400,
-      res: {message: validateDateRes.message}
+    const validateDateRes = validateDate(data.date);
+    if (validateDateRes.error) {
+      return {
+        status_code: 400,
+        message: validateDateRes.message,
+      };
     }
-   }
-   date = validateDateRes.date
+    date = validateDateRes.date;
   }
 
   await todo.update(
@@ -117,7 +126,8 @@ exports.tood_update = async (data, id, userId) => {
 
   return {
     status_code: 200,
-    res: { message: "Todo updated successfully", data: updatedTodo },
+    message: "Todo updated successfully",
+    data: updatedTodo,
   };
 };
 
@@ -126,25 +136,25 @@ exports.todo_delete = async (id, userId) => {
     where: { id },
   });
 
-  if (!userTodo) {
-    return {
-      status_code: 400,
-      res: { message: "Todo not found" },
-    };
-  }
   // console.log("id", id);
   // console.log("userID", userId);
   // console.log("usertodo", userTodo.userId);
-  
-  
-  
 
-  if (userTodo.userId != userId) {
+  const todoFoundOrNotRes = todoFoundOrNot(userTodo);
+  if (todoFoundOrNotRes) {
     return {
-      status_code: 401,
-      res: {
-        message: "Unauthorized: Not your todo",
-      },
+      ...todoFoundOrNotRes,
+    };
+  }
+
+  const userIsAuthorizedOrNotRes = userIsAuthorizedOrNot(
+    userTodo.userId,
+    userId
+  );
+
+  if (userIsAuthorizedOrNotRes) {
+    return {
+      ...userIsAuthorizedOrNotRes,
     };
   }
 
@@ -154,7 +164,7 @@ exports.todo_delete = async (id, userId) => {
 
   return {
     status_code: 200,
-    res: { message: "Todo is deleted" },
+    message: "Todo is deleted",
   };
 };
 
@@ -165,31 +175,33 @@ exports.todo_read = async (id, userId) => {
   const userTodo = await todo.findOne({
     where: { id },
   });
-  
-  if (!userTodo) {
+
+  const todoFoundOrNotRes = todoFoundOrNot(userTodo);
+  if (todoFoundOrNotRes) {
     return {
-      status_code: 400,
-      res: { message: "Todo not found" },
+      ...todoFoundOrNotRes,
     };
   }
 
-  if (userTodo.userId != userId) {
+  const userIsAuthorizedOrNotRes = userIsAuthorizedOrNot(
+    userTodo.userId,
+    userId
+  );
+
+  if (userIsAuthorizedOrNotRes) {
     return {
-      status_code: 401,
-      res: { message: "Unauthorized : Not your todo" },
+      ...userIsAuthorizedOrNotRes,
     };
   }
 
   return {
     status_code: 200,
-    res: {
-      data: {
-        id: userTodo.id,
-        title: userTodo.title,
-        description: userTodo.description,
-        date: userTodo.date,
-        userId: userTodo.userId,
-      },
+    data: {
+      id: userTodo.id,
+      title: userTodo.title,
+      description: userTodo.description,
+      date: userTodo.date,
+      userId: userTodo.userId,
     },
   };
 };

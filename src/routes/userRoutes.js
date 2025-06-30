@@ -10,7 +10,6 @@ const {upload} = require("../utills/uploadPhoto.js");
 router.use(jwtAuthMiddleware);
 router.get("/get-details", userGet)
 router.put("/update", upload.single("profile"), userUpdate);
-
 router.delete("/delete", userDelete);
 
 module.exports = router;

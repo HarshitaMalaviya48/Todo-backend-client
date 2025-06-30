@@ -28,7 +28,7 @@ exports.user_get = async (userId) => {
     }
 } 
 
-exports.user_update = async (userId, data, authHeader) => {
+exports.user_update = async (userId, data, file, authHeader) => {
     const bodyParsingError = bodyParsing(data);
   if (bodyParsingError)  return bodyParsingError;
 
@@ -49,7 +49,7 @@ exports.user_update = async (userId, data, authHeader) => {
     const userName = data.userName || existingUser.userName;
     const email = data.email || existingUser.email;
     const phoneNo = data.phoneNo || existingUser.phoneNo;
-    const profile = data.file ? data.file.path : existingUser.profile;
+    const profile = file ? file.path : existingUser.profile;
 
     const error = userDetailsValidator(userName, email, phoneNo);
     if (error) {

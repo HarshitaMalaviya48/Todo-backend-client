@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+
 
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
@@ -10,22 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    generateToken = async () => {
-      try {
-        return jwt.sign(
-          {
-            userId: this.id,
-            userName: this.userName,
-            email: this.email,
-          },
-          process.env.JWT_SECRET_KEY,
-          { expiresIn: "8h" }
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
+    
     static associate(models) {
       // define association here
     }

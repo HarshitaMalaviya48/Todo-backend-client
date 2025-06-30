@@ -1,4 +1,4 @@
-import { validateTodo, validateDate } from "../src/utills/todoHelper.js";
+import { validateTodo, validateDate, todoFoundOrNot, userIsAuthorizedOrNot } from "../src/utills/todoHelper.js";
 
 import * as chai from "chai";
 const expect = chai.expect;
@@ -58,3 +58,30 @@ describe("In validateDate function", () => {
     expect(result).to.eql(expectedResult)
   })
 });
+
+describe("In todoFoundOrNot function", () => {
+  it("should return an error if todo is empty", async () => {
+    const result = todoFoundOrNot();
+    expect(result.status_code).to.be.eq(404);
+    expect(result).to.have.property("message");
+  });
+
+  it("should return null if todo is found", async () => {
+    const result = todoFoundOrNot({});
+   expect(result).to.be.null;
+  })
+})
+
+describe.only("In userIsAuthorizedOrNot function", () => {
+  it("should return an error if user is not authorized", async () => {
+    const result = userIsAuthorizedOrNot(12, 11);
+
+    expect(result.status_code).to.be.eq(401);
+    expect(result).to.have.property("message");
+  })
+  it("should return null if user is authorized", async () => {
+    const result = userIsAuthorizedOrNot(12, 12);
+expect(result).to.be.null;
+   
+  })
+})

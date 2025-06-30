@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const { jwtAuthMiddleware } = require("../middleware/jwt");
 const { registration, login, logout } = require("../controller/auth");
 const { upload } = require("../utills/uploadPhoto");
-const { jwtAuthMiddleware } = require("../middleware/jwt");
 
 router.post("/registration", upload.single("profile"), registration);
 

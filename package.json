@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test"
+    "test": "mocha test/errorHandler.test.mjs"
   },
   "keywords": [],
   "author": "",
@@ -20,12 +20,16 @@
     "libphonenumber-js": "^1.12.9",
     "multer": "^2.0.1",
     "mysql2": "^3.14.1",
+    "node-mocks-http": "^1.17.2",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@types/sequelize": "^4.28.20",
     "chai": "^5.2.0",
-    "mocha": "^11.7.1"
+    "mocha": "^11.7.1",
+    "supertest": "^7.1.1",
+    "sinon": "^21.0.0",
+    "sinon-chai": "^4.0.0"
   }
 }
