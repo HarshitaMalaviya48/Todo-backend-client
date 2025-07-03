@@ -17,21 +17,13 @@ exports.register_user = async (data) => {
 
   const { userName, email, phoneNo, password } = data;
   const profilePath = data.file ? data.file.path : null;
-  const error = userDetailsValidator(userName, email, phoneNo);
-
-  if (error) {
-    // console.log("in validator error block");
-
-    return { status_code: 400, message: error };
-  }
-
+  const userErrors = userDetailsValidator(userName, email, phoneNo);
   const passwordError = validtaPassword(password);
 
-  if (passwordError) {
-    // console.log("in password  validator error block");
-    return { status_code: 400, message: passwordError };
+  const validationErrors = {...userErrors, ...passwordError}
+  if(Object.keys(validationErrors).length > 0){
+    return {status_code: 400, error: validationErrors}
   }
-
   const hashedPassword = await passwordHelper.hashPassword(password);
   // console.log(hashedPassword);
 
@@ -57,14 +49,28 @@ exports.login_user = async (data) => {
   if (bodyParsingError) {
     return bodyParsingError;
   }
-  const { email, password } = data;
+  const { email, password, confirmPassword } = data;
 
   // console.log(email, password);
-  if (!email || !password) {
-    return {
-      status_code: 400,
-      res: { message: "Email and Password both are mendatory" },
-    };
+  const error = {};
+  if(!email){
+    error.email = "Email is Mandatory"
+  }
+  if(!password){
+    error.password = "Password is Mandatory"
+  }
+  if(!confirmPassword){
+    error.confirmPassword = "Confirm Password is Mandatory";
+  }
+  console.log("error", error);
+  
+  if(Object.keys(error).length > 0){
+    return {status_code: 400, error: error}
+  }
+  
+  if(confirmPassword !== password){
+    error.doesPasswordMatched = "Password do not Matched";
+    return {status_code: 400, error: error};
   }
 
   const getUser = await user.findOne({
@@ -75,15 +81,16 @@ exports.login_user = async (data) => {
     !getUser ||
     !(await passwordHelper.comparePassword(password, getUser.password))
   ) {
+    error.credentialError = "Invalid Credentials"
     return {
       status_code: 401,
-      res: { message: "Invalid Credentials" },
+       error:  error,
     };
   }
 
   return {
     status_code: 200,
-    res: { message: "User is logged in", token: await generateToken(getUser) },
+    message: "User is logged in", token: await generateToken(getUser) ,
   };
 };
 
@@ -100,6 +107,6 @@ exports.logout_user = async (authHeader) => {
 
   return {
     status_code: 200,
-    res: { message: "user logout successfully" },
+   message: "user logout successfully" ,
   };
 };

@@ -18,13 +18,13 @@ exports.user_get = async (userId) => {
     if(!userDetail){
         return {
             status_code: 404,
-            res: {message: "User not found"}
+           message: "User not found"
         }
     }
 
     return {
         status_code: 200,
-        res: {data: userDetail}
+       data: userDetail
     }
 } 
 
@@ -42,7 +42,7 @@ exports.user_update = async (userId, data, file, authHeader) => {
     if(!existingUser){
         return {
             status_code: 404,
-            res: {message: "User does not Exists"}
+            message: "User does not Exists"
         }
     }
 
@@ -50,22 +50,25 @@ exports.user_update = async (userId, data, file, authHeader) => {
     const email = data.email || existingUser.email;
     const phoneNo = data.phoneNo || existingUser.phoneNo;
     const profile = file ? file.path : existingUser.profile;
+    const newPassword = data.password;
 
-    const error = userDetailsValidator(userName, email, phoneNo);
-    if (error) {
-      return { status_code: 400, res: { message: error } };
-    }
+    const userErrors = userDetailsValidator(userName, email, phoneNo);
 
+    let passwordError = null;
     let finalHashPassword = existingUser.password;
     let passwordchanged = false;
-    const newPassword = data.password;
+    
     if (newPassword) {
-      const passwordError = validtaPassword(newPassword);
-      if (passwordError) {
-        return { status_code: 400, res: { message: passwordError } };
+      passwordError = validtaPassword(newPassword, true);
+      if (!passwordError) {
+        finalHashPassword = await passwordHelper.hashPassword(newPassword);
+        passwordchanged = true;
       }
-      finalHashPassword = await passwordHelper.hashPassword(newPassword);
-      passwordchanged = true;
+    }
+
+    const validationErrors = {...userErrors, ...passwordError}
+    if(Object.keys(validationErrors).length > 0){
+      return {status_code: 400, error: validationErrors}
     }
 
     const isSensitiveChange = email != existingUser.email || passwordchanged;
@@ -103,11 +106,11 @@ exports.user_update = async (userId, data, file, authHeader) => {
 
     return {
         status_code: 200,
-        res: {
+       
             message: "User updated successfully",
             redirectToLogin: isSensitiveChange,
             data: updatedUser
-        }
+        
     }
 
 }
@@ -121,7 +124,7 @@ exports.user_delete = async (userId) => {
     if (!existingUser) {
       return {
         status_code: 404,
-        res: {message: "User does not exist"}
+        message: "User does not exist"
       };
     }
 
@@ -131,7 +134,7 @@ exports.user_delete = async (userId) => {
 
     return {
         status_code: 200,
-        res: { message: "User deleted successfully" }
+        message: "User deleted successfully" 
     }
 
 

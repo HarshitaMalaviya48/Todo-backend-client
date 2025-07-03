@@ -9,7 +9,7 @@ const registration = async (req, res) => {
   try {
     const posted_data = req.body;
     const response = await authModule.register_user(posted_data);
-    const {status_code, ...rest} = response;
+    const { status_code, ...rest } = response;
 
     res.status(status_code).json(rest);
   } catch (error) {
@@ -23,11 +23,9 @@ const registration = async (req, res) => {
 const login = async (req, res) => {
   try {
     const posted_data = req.body;
-    const response = await authModule.login_user(posted_data);
+    const { status_code, ...rest } = await authModule.login_user(posted_data);
 
-    return res.status(response.status_code).json({
-      ...response.res,
-    });
+    return res.status(status_code).json(rest);
   } catch (error) {
     return handleServerError(error, res);
   }
@@ -38,9 +36,9 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    const response = await authModule.logout_user(authHeader);
+    const { status_code, ...rest } = await authModule.logout_user(authHeader);
 
-    return res.status(response.status_code).json({ ...response.res });
+    return res.status(status_code).json(rest);
   } catch (error) {
     return handleServerError(error, res);
   }

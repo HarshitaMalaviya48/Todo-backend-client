@@ -9,9 +9,9 @@ const {sequelizeUniqueConstraintError, sequelizeForeignKeyConstraintError, handl
 const userGet = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const response = await userModule.user_get(userId);
+    const {status_code, ...rest} = await userModule.user_get(userId);
 
-    return res.status(response.status_code).json({ ...response.res });
+    return res.status(status_code).json(rest);
   } catch (error) {
     return handleServerError(error, res)
   }
@@ -24,11 +24,9 @@ const userUpdate = async (req, res) => {
     const posted_data = req.body;
     const userId = req.user.userId;
     const authHeader = req.headers.authorization
-    const response = await userModule.user_update(userId, posted_data, req.file, authHeader);
+    const {status_code, ...rest} = await userModule.user_update(userId, posted_data, req.file, authHeader);
 
-    return res.status(response.status_code).json({
-      ...response.res,
-    });
+    return res.status(status_code).json(rest);
   } catch (error) {
     console.error(error);
     return sequelizeUniqueConstraintError(error, res);
@@ -39,9 +37,9 @@ const userUpdate = async (req, res) => {
 const userDelete = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const response = await userModule.user_delete(userId);
+    const {status_code, ...rest} = await userModule.user_delete(userId);
 
-    res.status(response.status_code).json({ ...response.res });
+    res.status(status_code).json(rest);
   } catch (error) {
     return sequelizeForeignKeyConstraintError(error, res)
     

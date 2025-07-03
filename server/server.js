@@ -1,9 +1,18 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
+// let's tackel cors
+const corsOption = {
+  origin: "http://localhost:3000",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credential: true
+}
+app.use(cors(corsOption));
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 const logRequest = (req, res, next) => {
   console.log(
@@ -26,9 +35,9 @@ app.use((req,res) => {
   res.status(404).json({error: "Route not found"});
 })
 
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, () => {
-  console.log("Server is running on port 3000");
+  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = {app}
