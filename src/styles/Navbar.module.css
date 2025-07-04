@@ -1,0 +1,25 @@
+.container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30rem;
+    padding: 2rem 10rem;
+    width: 100vw;
+}
+
+.appName{
+    font-size: 30px;
+}
+
+.links{
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 2rem
+}
+
+.link{
+    text-decoration: none;
+    color: black;
+    font-size: 20px;
+}
