@@ -1,0 +1,127 @@
+.container{
+    margin-top: 10vh;
+}
+
+.form{
+    display: flex;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+    gap: 45px;
+    /* position: relative; */
+}
+
+.form .inputDiv{
+display: flex;
+flex-direction: column;
+gap: 5px;
+width: 16%;
+}
+
+.form .inputDiv .inputLabel{
+    font-size: 1.5rem;
+}
+
+.form .inputDiv .inputLabel .inputSpan{
+  color: red;
+  margin-right: 2px;
+}
+
+.form .inputDiv .userInput{
+    width: 100%;
+    height: 40px;
+    font-size: 1rem;
+    padding: 0 10px;
+}
+
+.form .button{
+    font-size: 1rem;
+    width: 5vw;
+    height: 40px;
+    margin-bottom: 0px;
+}
+
+.form .inputDiv .error{
+  height: 2vh;
+  color: red;
+}
+/* Todo list  */
+
+/* .todoList{
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+
+}
+
+.todoList .todoItems{
+    display: flex;
+    flex-direction: column;
+}
+
+.todoList .todoItems .todo {
+display: flex;
+width: 100vw;
+    justify-content: center;
+    align-items: center;
+    gap: 45px;
+    font-size: 24px;
+} */
+
+.todoList {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+}
+
+.todoList .todoItems {
+  display: flex;
+  flex-direction: column;
+  width: 68vw;
+}
+
+
+.todo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  margin: 10px 0;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  
+}
+
+
+.todoDetails {
+  display: flex;
+  gap: 4px;
+  font-size: 1.5rem;
+}
+
+.todoDetails p{
+    width: 18vw;
+}
+
+
+
+
+.todoActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.actionSelect {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background-color: white;
+  transition: border-color 0.2s ease;
+}
+
+.actionSelect:hover {
+  border-color: #888;
+}

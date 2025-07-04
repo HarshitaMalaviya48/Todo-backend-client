@@ -1,24 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Navbar from "./components/Navbar";
+import Logout from "./components/Logout"
+import Todos from "./pages/Todos";
+import { toast } from "react-toastify";
 
 function App() {
+  let isLoggedIn = window.localStorage.getItem("isLoggedIn");
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          
+          {isLoggedIn ? (
+            <>
+              <Route path="/todos" element={<Todos />}></Route>
+              <Route path="/logout" element={<Logout />}></Route>
+            </>
+          ) : (
+           <>
+            <Route path="/register" element={<SignUp />} />
+           <Route path="/login" element={<Login />}></Route>
+           </>
+          )}
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 
