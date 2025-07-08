@@ -1,6 +1,9 @@
 .container{
     margin-top: 10vh;
 }
+.todosContainer{
+  margin-top: 50px;
+}
 
 .form{
     display: flex;

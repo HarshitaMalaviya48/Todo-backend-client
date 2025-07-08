@@ -1,8 +1,19 @@
+import { useState } from "react";
+
 import styles from "../styles/Navbar.module.css";
 import { NavLink } from "react-router-dom";
+import { AuthConsumer } from "../store/auth";
 
 function Navbar() {
-  const isLoggedIn = window.localStorage.getItem("isLoggedIn");
+  const { isLoggedIn,  userprofilePicture} = AuthConsumer();
+  const imageUrl = userprofilePicture;
+  console.log("in navbar", userprofilePicture);
+  
+  const [showDropDown, setShowDropDown] = useState(false);
+
+  const handleProfileClick = () => {
+    setShowDropDown((prev) => !prev);
+  };
   return (
     <>
       <header className={styles.container}>
@@ -17,16 +28,22 @@ function Navbar() {
 
             {isLoggedIn ? (
               <>
-            
                 <li>
                   <NavLink to="/todos" className={styles.link}>
                     Todos
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink to="/logout" className={styles.link}>
-                    <div style={{width: "50px", height: "50px", border: "2px solid black", borderRadius: "50%"}}></div>
-                  </NavLink>
+                <li className={styles.profileContainer}>
+                  <div className={styles.imageDiv} onClick={handleProfileClick}>
+                    <img src={imageUrl} className={styles.image}></img>
+                  </div>
+                  {showDropDown && (
+                    <div className={styles.dropDown}>
+                      <NavLink to="/update-Profile" className={styles.link}>Update Profile</NavLink>
+                      <NavLink to="/logout" className={styles.link} >Logout</NavLink>
+                      <NavLink to="/delete-Profile" className={styles.link} >Delete Profile</NavLink>
+                    </div>
+                  )}
                 </li>
               </>
             ) : (

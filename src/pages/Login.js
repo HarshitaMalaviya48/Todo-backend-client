@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import styles from "../styles/SignUp.module.css";
 import { AuthConsumer } from "../store/auth";
 import { toast } from "react-toastify";
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate()
-  const { storeTokenInLS } = AuthConsumer();
+  const { storeTokenInLS, setIsLoggedIn, setToken } = AuthConsumer();
   const initialValue = {
     email: "",
     password: "",
@@ -42,7 +42,8 @@ function Login() {
       console.log(res_data);
       if (response.status === 200) {
         storeTokenInLS(res_data.token);
-        window.localStorage.setItem('isLoggedIn', true)
+        setToken(res_data.token);
+       setIsLoggedIn(true)
         setLogInDetails(initialValue);
         setFormErrors({});
         toast.success(res_data.message);

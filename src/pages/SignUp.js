@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthConsumer } from "../store/auth";
 //toast
 import { toast } from "react-toastify";
 import styles from "../styles/SignUp.module.css";
 
 function SignUp() {
+  const {storeProfileInLS} = AuthConsumer();
   const navigate = useNavigate();
 
   const initialVlaue = {
@@ -18,22 +20,22 @@ function SignUp() {
   const [formErrors, setFormErrors] = useState({});
 
   const handleInput = (e) => {
-  
     const { name, value, files } = e.target;
-console.log("outside if block");
+    console.log("outside if block");
 
     if (name === "profile") {
-      console.log("files",files[0]);
-      
+      console.log("files", files[0]);
+
       setUserDetails({
         ...userDetails,
         profile: files[0],
       });
+    } else {
+      setUserDetails({
+        ...userDetails,
+        [name]: value,
+      });
     }
-    setUserDetails({
-      ...userDetails,
-      [name]: value,
-    });
   };
 
   const handleSubmit = async (e) => {
@@ -56,10 +58,12 @@ console.log("outside if block");
       console.log("data", res_data);
 
       if (response.status === 200) {
+        const data = res_data.data
         setUserDetails(initialVlaue);
         setFormErrors({});
         toast.success(res_data.message);
-
+        // window.localStorage.setItem("profile", data.profile)
+       storeProfileInLS(data.profile);
         navigate("/login");
       } else if (res_data.error && response.status === 400) {
         setFormErrors({
@@ -128,7 +132,7 @@ console.log("outside if block");
           <label className={styles.inputLabel}>Profile: </label>
           <input
             className={styles.userInput}
-            value={userDetails.profile}
+            // value={userDetails.profile}
             onChange={handleInput}
             type="file"
             name="profile"

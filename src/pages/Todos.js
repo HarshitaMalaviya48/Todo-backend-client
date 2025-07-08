@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../styles/Todos.module.css";
 import Todo from "./Todo";
+import { AuthConsumer } from "../store/auth";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 function Todos() {
+  const navigate = useNavigate();
+  const { token, setToken, setIsLoggedIn } = AuthConsumer();
+  // console.log("token", token);
+
   const initialTodos = [];
   const initialTodo = {
     title: "",
@@ -10,8 +17,34 @@ function Todos() {
     date: "",
   };
   const [todo, setTodo] = useState(initialTodo);
+  const [originalTodo, setOriginalTodo] = useState({});
   const [todoItems, setTodoItems] = useState(initialTodos);
   const [todoErrors, setTodoErrors] = useState({});
+  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [editId, setEditId] = useState(null);
+
+  useEffect(() => {
+    console.log("In todos page useeffect");
+
+    const getTodoItems = async () => {
+      const response = await fetch("http://localhost:3001/todo/readTodos", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const res_data = await response.json();
+      console.log("in useEffect todos", res_data);
+
+      if (response.status === 200) {
+        setTodoItems(res_data.data);
+      } else if (response.status === 404) {
+        setTodoItems([]);
+      }
+    };
+    getTodoItems();
+  }, [shouldRefresh]);
 
   const handleInput = (e) => {
     const name = e.target.name;
@@ -22,16 +55,16 @@ function Todos() {
   const handleClearBtn = (e) => {
     e.preventDefault();
     setTodo(initialTodo);
+    setTodoErrors({});
   };
 
   const handleAddButton = async (e) => {
     e.preventDefault();
-
     const response = await fetch("http://localhost:3001/todo/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(todo),
     });
@@ -41,19 +74,12 @@ function Todos() {
 
     console.log("res data", res_data);
     if (response.status === 200) {
+      setShouldRefresh((prev) => !prev);
       console.log("Todo created");
-      setTodoItems([
-        ...todoItems,
-        {
-          title: res_data.data.title,
-          description: res_data.data.description,
-          date: res_data.data.date,
-        },
-      ]);
-      console.log(todoItems);
+      console.log("todo items", todoItems);
       setTodo(initialTodo);
       setTodoErrors({});
-    } else if (res_data.error) {
+    } else if (response.status === 400) {
       setTodoErrors({
         title: res_data.error.title,
         description: res_data.error.description,
@@ -62,13 +88,74 @@ function Todos() {
       console.log("Todo errors set", todoErrors);
 
       console.log("Error", res_data.error);
+    } else if (response.status === 401) {
+      setIsLoggedIn(false);
+      toast.error(res_data.error);
+      navigate("/login");
+      setToken("");
+    }
+  };
+
+  const handleUpdateBtn = async (e) => {
+    e.preventDefault()
+    if(editId === null){
+      toast.error("First select todo to update")
+    }
+    let isEdited = false;
+    for(let key in todo){
+      if(todo[key] !== originalTodo[key]){
+        isEdited = true;
+      }
     }
 
-    console.log("todo items", todo);
+    if(!isEdited) {
+      toast.error("Nothing is Edited");
+      return;
+    }
+
+    const response = await fetch(
+      `http://localhost:3001/todo/update/${editId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(todo),
+      }
+    );
+
+    const res_data = await response.json();
+    console.log("response in handleUpdateOption", response);
+    console.log("res_data in handleUpdateOption", res_data);
+    if (response.status === 200) {
+      toast.success(res_data.message);
+      setShouldRefresh((prev) => !prev);
+      console.log("Todo updated");
+      console.log("todo items", todoItems);
+      setTodo(initialTodo);
+      setTodoErrors({});
+      setEditId(null)
+    } else if (response.status === 400) {
+      setTodoErrors({
+        title: res_data.error.title,
+        description: res_data.error.description,
+        date: res_data.error.date,
+      });
+      console.log("Todo errors set", todoErrors);
+
+      console.log("Error", res_data.error);
+    } else if (response.status === 401) {
+      setIsLoggedIn(false);
+      toast.error(res_data.error);
+      navigate("/login");
+      setToken("");
+    }
+    
   };
   return (
     <>
-      <div >
+      <div className={styles.todosContainer}>
         <form onSubmit={handleAddButton} className={styles.form}>
           <div className={styles.inputDiv}>
             <label className={styles.inputLabel}>
@@ -119,14 +206,29 @@ function Todos() {
           <button className={styles.button} onClick={handleClearBtn}>
             Clear
           </button>
+          <button className={styles.button} onClick={handleUpdateBtn}>
+            Update
+          </button>
         </form>
 
         {/* Rendering todo items  */}
         <div className={styles.todoList}>
-          <ul className={styles.todoItems} >
-          {todoItems.map((item, index) => {
-            return <Todo key={index} item={item}/>;
-          })}
+          <ul className={styles.todoItems}>
+            {todoItems.length > 0 ? (
+              todoItems.map((item, index) => (
+                <Todo
+                  key={item.id}
+                  item={item}
+                  todo={todo}
+                  setShouldRefresh={setShouldRefresh}
+                  setTodo={setTodo}
+                  setEditId={setEditId}
+                  setOriginalTodo={setOriginalTodo}
+                />
+              ))
+            ) : (
+              <p>No todos found</p>
+            )}
           </ul>
         </div>
       </div>

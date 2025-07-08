@@ -1,9 +1,15 @@
-.container{
-    display: flex;
-   height: 80vh;
+.updateContainer{
+  display: flex;
+  gap: 30px;
+  height: 80vh;
    width: 100vw;
-    align-items: center;
+   align-items: center;
     justify-content: center;
+}
+
+.container{
+    display: flex; 
+    
     flex-direction: column;
     gap: 2rem;
 }
@@ -44,3 +50,11 @@
   color: red;
 }
 
+.profileContainer {
+  flex: 1;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+  max-width: 400px;
+}
