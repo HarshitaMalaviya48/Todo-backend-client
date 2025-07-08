@@ -13,20 +13,20 @@ const todo = db.todo;
 exports.todo_create = async (data, userId) => {
   const { title, description, date } = data;
 
-  const validateTodoRes = validateTodo(title, description, date);
-  if (validateTodoRes) {
-    return {
-      status_code: 400,
-      message: validateTodoRes,
-    };
-  }
-
+  const validateTodoerror = validateTodo(title, description, date);
   const validateDateRes = validateDate(date);
+  let validationErrors = { ...validateTodoerror };
 
-  if (validateDateRes.error) {
+  if (validateDateRes.error && !validationErrors.date) {
+    validationErrors.date = validateDateRes.message;
     return {
       status_code: 400,
-      message: validateDateRes.message,
+      error: validationErrors,
+    };
+  } else if(Object.keys(validationErrors).length > 0) {
+    return {
+      status_code: 400,
+      error: validationErrors,
     };
   }
 

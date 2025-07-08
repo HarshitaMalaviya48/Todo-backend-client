@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path")
 
 const app = express();
 
@@ -10,6 +11,7 @@ const corsOption = {
   credential: true
 }
 app.use(cors(corsOption));
+app.use("/uploads",express.static(path.join(__dirname, "uploads")))
 
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));

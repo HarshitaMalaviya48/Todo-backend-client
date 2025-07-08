@@ -11,6 +11,8 @@ const {
 const passwordHelper = require("../utills/passwordHelper");
 
 exports.user_get = async (userId) => {
+  console.log("in userGet module");
+  
     const userDetail = await user.findOne({
         where: {id: userId}
     })
@@ -49,7 +51,8 @@ exports.user_update = async (userId, data, file, authHeader) => {
     const userName = data.userName || existingUser.userName;
     const email = data.email || existingUser.email;
     const phoneNo = data.phoneNo || existingUser.phoneNo;
-    const profile = file ? file.path : existingUser.profile;
+    const profile = file && `uploads/${file.filename}` ;
+    const profileUrl = profile && `http://localhost:3001/${profile.replace(/\\/g, "/")}`;
     const newPassword = data.password;
 
     const userErrors = userDetailsValidator(userName, email, phoneNo);
@@ -73,16 +76,16 @@ exports.user_update = async (userId, data, file, authHeader) => {
 
     const isSensitiveChange = email != existingUser.email || passwordchanged;
 
-    if(isSensitiveChange){
-      const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
-      console.log("in update block",decoded);
+    // if(isSensitiveChange){
+    //   const token = authHeader.split(" ")[1];
+    //   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
+    //   console.log("in update block",decoded);
       
-      await blackListToken.create({
-        token,
-        expiresAt: new Date(decoded.exp * 1000)
-      })
-    }
+    //   await blackListToken.create({
+    //     token,
+    //     expiresAt: new Date(decoded.exp * 1000)
+    //   })
+    // }
 
     await user.update(
       {
@@ -109,7 +112,10 @@ exports.user_update = async (userId, data, file, authHeader) => {
        
             message: "User updated successfully",
             redirectToLogin: isSensitiveChange,
-            data: updatedUser
+            data: {
+              ...updatedUser,
+              profile: profileUrl
+            }
         
     }
 
@@ -127,6 +133,7 @@ exports.user_delete = async (userId) => {
         message: "User does not exist"
       };
     }
+
 
     await user.destroy({
       where: { id: userId },

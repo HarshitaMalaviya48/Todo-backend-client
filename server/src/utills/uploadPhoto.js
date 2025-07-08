@@ -1,7 +1,9 @@
 const multer = require("multer");
 
 //To stote profile locally
+console.log("Inside multer");
 const storage = multer.diskStorage({
+  
   destination: (req, file, callback) => {
     callback(null, "uploads/");
   },
@@ -10,5 +12,6 @@ const storage = multer.diskStorage({
     callback(null, suffix + "_" + file.originalname);
   },
 });
+console.log("outside multer");
 
 exports.upload = multer({ storage });

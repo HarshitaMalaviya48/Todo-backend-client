@@ -7,8 +7,11 @@ const {
 // POST method to register user
 const registration = async (req, res) => {
   try {
+    // console.log(req.file);
+    
     const posted_data = req.body;
-    const response = await authModule.register_user(posted_data);
+    const posted_file = req.file;
+    const response = await authModule.register_user(posted_data, posted_file);
     const { status_code, ...rest } = response;
 
     res.status(status_code).json(rest);

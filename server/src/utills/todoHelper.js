@@ -2,16 +2,19 @@
 const { format, parse } = require("date-fns");
 
 const validateTodo = (title, description, date) => {
+  const error ={};
   if (!title) {
-    return "Title is Mandatory";
+    error.title = "Title is Mandatory";
+    
   }
   if (!description) {
-    return "Description is Mandatory";
+    error.description = "Description is Mandatory";
+    
   }
   if (!date) {
-    return "Date is Mandatory";
+    error.date = "Date is Mandatory";
   }
-  return null;
+  return Object.keys(error).length > 0 ? error : null
 };
 
 const validateDate = (date) => {

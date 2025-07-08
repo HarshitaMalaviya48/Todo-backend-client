@@ -8,6 +8,8 @@ const {sequelizeUniqueConstraintError, sequelizeForeignKeyConstraintError, handl
 
 const userGet = async (req, res) => {
   try {
+    console.log("in userGet controller");
+    
     const userId = req.user.userId;
     const {status_code, ...rest} = await userModule.user_get(userId);
 

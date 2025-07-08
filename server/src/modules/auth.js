@@ -11,12 +11,15 @@ const db = require("../db/models");
 const user = db.user;
 const blackListToken = db.blackListToken;
 
-exports.register_user = async (data) => {
+exports.register_user = async (data, file) => {
   const bodyParsingError = bodyParsing(data);
   if (bodyParsingError) return bodyParsingError;
-
+  
   const { userName, email, phoneNo, password } = data;
-  const profilePath = data.file ? data.file.path : null;
+  const profilePath = file ? `uploads/${file.filename}` : `uploads/profile_icon.jpg`;
+  const profileUrl = `http://localhost:3001/${profilePath.replace(/\\/g, "/")}`;
+  console.log("statis profile icon", profileUrl);
+  
   const userErrors = userDetailsValidator(userName, email, phoneNo);
   const passwordError = validtaPassword(password);
 
@@ -31,14 +34,17 @@ exports.register_user = async (data) => {
     userName,
     email,
     phoneNo,
-    profile: profilePath,
+    profile: profileUrl,
     password: hashedPassword,
   });
 
   return {
     status_code: 200,
     message: "User registered Successfully",
-    data: newUser,
+    data: {
+      ...newUser.toJSON(),
+      profile: profileUrl
+    },
   };
 
   // throw new Error("database connection failed")
