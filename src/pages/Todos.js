@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles/Todos.module.css";
-import Todo from "./Todo";
+import Todo from "../components/Todo";
+import TodoForm from "../components/TodoForm";
 import { AuthConsumer } from "../store/auth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,7 @@ function Todos() {
   const [todoErrors, setTodoErrors] = useState({});
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
 
   useEffect(() => {
     console.log("In todos page useeffect");
@@ -30,7 +32,7 @@ function Todos() {
       const response = await fetch("http://localhost:3001/todo/readTodos", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -41,10 +43,14 @@ function Todos() {
         setTodoItems(res_data.data);
       } else if (response.status === 404) {
         setTodoItems([]);
+      }else if(response.status === 401){
+        toast.error(res_data.error);
+        setToken("")
+        navigate("/login");  
       }
     };
     getTodoItems();
-  }, [shouldRefresh]);
+  }, [token, shouldRefresh]);
 
   const handleInput = (e) => {
     const name = e.target.name;
@@ -56,6 +62,7 @@ function Todos() {
     e.preventDefault();
     setTodo(initialTodo);
     setTodoErrors({});
+    setIsUpdateMode(false);
   };
 
   const handleAddButton = async (e) => {
@@ -64,7 +71,7 @@ function Todos() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(todo),
     });
@@ -97,18 +104,19 @@ function Todos() {
   };
 
   const handleUpdateBtn = async (e) => {
-    e.preventDefault()
-    if(editId === null){
-      toast.error("First select todo to update")
+    e.preventDefault();
+    if (editId === null) {
+      toast.error("First select todo to update");
+      return;
     }
     let isEdited = false;
-    for(let key in todo){
-      if(todo[key] !== originalTodo[key]){
+    for (let key in todo) {
+      if ( todo[key] !== "" && todo[key] !== originalTodo[key]) {
         isEdited = true;
       }
     }
 
-    if(!isEdited) {
+    if (!isEdited) {
       toast.error("Nothing is Edited");
       return;
     }
@@ -119,7 +127,7 @@ function Todos() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(todo),
       }
@@ -135,12 +143,12 @@ function Todos() {
       console.log("todo items", todoItems);
       setTodo(initialTodo);
       setTodoErrors({});
-      setEditId(null)
+      setEditId(null);
+        setIsUpdateMode(false);
+     
     } else if (response.status === 400) {
       setTodoErrors({
-        title: res_data.error.title,
-        description: res_data.error.description,
-        date: res_data.error.date,
+        date: res_data.error,
       });
       console.log("Todo errors set", todoErrors);
 
@@ -151,12 +159,12 @@ function Todos() {
       navigate("/login");
       setToken("");
     }
-    
+  
   };
   return (
     <>
       <div className={styles.todosContainer}>
-        <form onSubmit={handleAddButton} className={styles.form}>
+        {/* <form onSubmit={handleAddButton} className={styles.form}>
           <div className={styles.inputDiv}>
             <label className={styles.inputLabel}>
               {" "}
@@ -209,7 +217,18 @@ function Todos() {
           <button className={styles.button} onClick={handleUpdateBtn}>
             Update
           </button>
-        </form>
+        </form> */}
+        <TodoForm
+          handleAddButton={handleAddButton}
+          handleInput={handleInput}
+          todo={todo}
+          todoErrors={todoErrors}
+          handleClearBtn={handleClearBtn}
+          handleUpdateBtn={handleUpdateBtn}
+          shouldShowAddAndClearBtn = {true}
+          isUpdateMode={isUpdateMode}
+          handleBackButton={null}
+        ></TodoForm>
 
         {/* Rendering todo items  */}
         <div className={styles.todoList}>
@@ -224,10 +243,11 @@ function Todos() {
                   setTodo={setTodo}
                   setEditId={setEditId}
                   setOriginalTodo={setOriginalTodo}
+                  setIsUpdateMode={setIsUpdateMode}
                 />
               ))
             ) : (
-              <p>No todos found</p>
+              <p className={styles.noTodoFoundMessage}>No todos found</p>
             )}
           </ul>
         </div>

@@ -128,3 +128,9 @@ width: 100vw;
 .actionSelect:hover {
   border-color: #888;
 }
+
+.noTodoFoundMessage{
+  font-size: 30px;
+  text-align: center;
+  margin-top: 50px;
+}

@@ -10,7 +10,6 @@ function Login() {
   const initialValue = {
     email: "",
     password: "",
-    confirmPassword: "",
   };
   const [logInDetails, setLogInDetails] = useState(initialValue);
   const [formErrors, setFormErrors] = useState({});
@@ -53,8 +52,6 @@ function Login() {
           email: res_data.error.email,
           password: res_data.error.password,
           credentialError: res_data.error.credentialError,
-          confirmPassword: res_data.error.confirmPassword,
-          doesPasswordMatched: res_data.error.doesPasswordMatched,
         });
       }
     } catch (error) {
@@ -92,24 +89,9 @@ function Login() {
             required
           ></input>
           <p className={styles.error}>{formErrors.password}</p>
+          <p className={styles.error}>{formErrors.credentialError}</p>
         </div>
-        <div className={styles.inputDiv}>
-          <label className={styles.inputLabel} htmlFor="password">
-            <span className={styles.inputSpan}>*</span>Confirm Password:{" "}
-          </label>
-          <input
-            className={styles.userInput}
-            value={logInDetails.confirmPassword}
-            onChange={handleInput}
-            type="password"
-            name="confirmPassword"
-            required
-          ></input>
-          <p className={styles.error}>
-            {formErrors.confirmPassword} {formErrors.doesPasswordMatched}{" "}
-            {formErrors.credentialError}
-          </p>
-        </div>
+       
         <button className={styles.submitButton} type="submit">Login</button>
       </form>
     </div>

@@ -15,6 +15,7 @@ function SignUp() {
     phoneNo: "",
     profile: "",
     password: "",
+    confirmPassword: "",
   };
   const [userDetails, setUserDetails] = useState(initialVlaue);
   const [formErrors, setFormErrors] = useState({});
@@ -48,6 +49,7 @@ function SignUp() {
       formData.append("phoneNo", userDetails.phoneNo);
       formData.append("profile", userDetails.profile);
       formData.append("password", userDetails.password);
+      formData.append("confirmPassword", userDetails.confirmPassword)
       const response = await fetch("http://localhost:3001/auth/registration", {
         method: "POST",
         body: formData,
@@ -66,11 +68,14 @@ function SignUp() {
        storeProfileInLS(data.profile);
         navigate("/login");
       } else if (res_data.error && response.status === 400) {
+        const error = res_data.error;
         setFormErrors({
-          userName: res_data.error.userName,
-          email: res_data.error.email,
-          phoneNo: res_data.error.phoneNo,
-          password: res_data.error.password,
+          userName: error.userName,
+          email: error.email,
+          phoneNo: error.phoneNo,
+          password: error.password,
+          confirmPassword: error.confirmPassword,
+          passwordDoesNotMatchError: error.passwordDoesNotMatchError
         });
       } else if (response.status === 409) {
         toast.error(res_data.error);
@@ -147,11 +152,26 @@ function SignUp() {
             className={styles.userInput}
             value={userDetails.password}
             onChange={handleInput}
-            type="text"
+            type="password"
             name="password"
             required
           ></input>
           <p className={styles.error}>{formErrors.password}</p>
+        </div>
+        <div className={styles.inputDiv}>
+          <label className={styles.inputLabel}>
+            <span className={styles.inputSpan}>*</span>Confirm Password:{" "}
+          </label>
+          <input
+            className={styles.userInput}
+            value={userDetails.confirmPassword}
+            onChange={handleInput}
+            type="password"
+            name="confirmPassword"
+            required
+          ></input>
+          <p className={styles.error}>{formErrors.confirmPassword} {formErrors.passwordDoesNotMatchError}</p>
+
         </div>
         <button className={styles.submitButton} type="submit">
           Sign Up

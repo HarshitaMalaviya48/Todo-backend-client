@@ -5,8 +5,15 @@ import styles from "../styles/UpdateProfile.module.css";
 import { useNavigate } from "react-router-dom";
 
 function UpdateProfile() {
-  const { token, setToken, setIsLoggedIn, userprofilePicture, setUserprofilePicture} = AuthConsumer();
+  const {
+    token,
+    setToken,
+    setIsLoggedIn,
+    userprofilePicture,
+    setUserprofilePicture,
+  } = AuthConsumer();
   const navigate = useNavigate();
+
   // console.log("toke in update profile", token);
 
   const initialFormValue = {
@@ -20,7 +27,7 @@ function UpdateProfile() {
   const [displayData, setDisplayData] = useState({});
   const [formData, setFormData] = useState(initialFormValue);
   const [formError, setFormError] = useState({});
-  const [shouldRefresh, setShouldRefresh] = useState(false)
+  const [shouldRefresh, setShouldRefresh] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,10 +66,9 @@ function UpdateProfile() {
         toast.error("Something went wrong while fetching user data");
       }
     };
-    if(token){
+    if (token) {
       fetchData();
     }
-      
   }, [token, shouldRefresh]);
 
   const handleInputFocus = (field) => {
@@ -109,10 +115,9 @@ function UpdateProfile() {
 
     if (Object.keys(updatedField).length === 0) {
       toast.error("Nothing is provided");
+      setFormError({})
       return;
     }
-
-
 
     const formTosend = new FormData();
     for (let key in updatedField) {
@@ -122,29 +127,29 @@ function UpdateProfile() {
 
     console.log("form to send data", formTosend);
 
-    
     const response = await fetch("http://localhost:3001/user/update", {
       method: "PUT",
       headers: {
-        Authorization: `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
       },
       body: formTosend,
     });
     console.log("in update user1", userprofilePicture);
 
     const res_data = await response.json();
-    const data = res_data.data;
-    setShouldRefresh((prev) => !prev)
-    if(data.profile){
-      setUserprofilePicture(data.profile);
-    }
 
     console.log("in update user2", userprofilePicture);
-    
-    
+
     if (response.status === 200) {
+      const data = res_data.data;
+      setShouldRefresh((prev) => !prev);
+      if (data.profile) {
+        setUserprofilePicture(data.profile);
+      }
+
       toast.success(res_data.message);
       setFormData(initialFormValue);
+      setFormError({});
       setDisplayData(data);
       setOriginalDetails(data);
       if (res_data.redirectToLogin === true) {
@@ -180,7 +185,7 @@ function UpdateProfile() {
               className={styles.userInput}
               type="text"
               name="userName"
-              placeholder={displayData.userName}
+            
               value={formData.userName}
               onChange={handleInputChange}
               onFocus={() => handleInputFocus("userName")}
@@ -197,7 +202,7 @@ function UpdateProfile() {
               className={styles.userInput}
               type="email"
               name="email"
-              placeholder={displayData.email}
+            
               value={formData.email}
               onChange={handleInputChange}
               onFocus={() => handleInputFocus("email")}
@@ -213,7 +218,7 @@ function UpdateProfile() {
               className={styles.userInput}
               type="number"
               name="phoneNo"
-              placeholder={displayData.phoneNo}
+         
               value={formData.phoneNo}
               onChange={handleInputChange}
               onFocus={() => handleInputFocus("phoneNo")}
@@ -241,6 +246,7 @@ function UpdateProfile() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
+              onFocus={() => handleInputFocus("password")}
               required
             ></input>
             <p className={styles.error}>{formError.password}</p>

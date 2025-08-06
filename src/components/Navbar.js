@@ -20,14 +20,15 @@ function Navbar() {
         <div className={styles.appName}>Todo App</div>
         <nav>
           <ul className={styles.links}>
-            <li>
+            
+
+            {isLoggedIn ? (
+              <>
+              <li>
               <NavLink to="/" className={styles.link}>
                 Home
               </NavLink>
             </li>
-
-            {isLoggedIn ? (
-              <>
                 <li>
                   <NavLink to="/todos" className={styles.link}>
                     Todos
@@ -39,9 +40,9 @@ function Navbar() {
                   </div>
                   {showDropDown && (
                     <div className={styles.dropDown}>
-                      <NavLink to="/update-Profile" className={styles.link}>Update Profile</NavLink>
-                      <NavLink to="/logout" className={styles.link} >Logout</NavLink>
-                      <NavLink to="/delete-Profile" className={styles.link} >Delete Profile</NavLink>
+                      <NavLink to="/update-Profile" className={styles.link} onClick={handleProfileClick}>Update Profile</NavLink>
+                      <NavLink to="/logout" className={styles.link} onClick={handleProfileClick}>Logout</NavLink>
+                      <NavLink to="/delete-Profile" className={styles.link} onClick={handleProfileClick}>Delete Profile</NavLink>
                     </div>
                   )}
                 </li>
